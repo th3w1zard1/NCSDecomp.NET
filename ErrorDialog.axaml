@@ -1,0 +1,53 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:KNCSDecomp"
+        x:Class="KNCSDecomp.ErrorDialog"
+        x:DataType="local:ErrorDialog"
+        Title="Error"
+        Width="600"
+        Height="500"
+        MinWidth="400"
+        MinHeight="300">
+    <Grid RowDefinitions="Auto,5,*,5,Auto" Margin="10">
+        <TextBlock Grid.Row="0"
+                   Text="{Binding ErrorMessage}"
+                   TextWrapping="Wrap"
+                   FontWeight="Bold"
+                   Margin="0,0,0,5"/>
+
+        <TextBlock Grid.Row="0"
+                   Text="Exception Details (click Copy to copy full details for bug reports):"
+                   FontSize="10"
+                   Foreground="Gray"
+                   Margin="0,20,0,0"/>
+
+        <ScrollViewer Grid.Row="2"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Auto">
+            <TextBox Name="ExceptionDetailsTextBox"
+                     IsReadOnly="True"
+                     Text="{Binding ExceptionDetails}"
+                     TextWrapping="NoWrap"
+                     FontFamily="Courier New"
+                     FontSize="10"
+                     Background="#F5F5F5"
+                     BorderThickness="1"
+                     BorderBrush="Gray"/>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="4"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Spacing="10">
+            <Button Name="CopyButton"
+                    Content="Copy Exception Details"
+                    Click="OnCopyClick"
+                    Padding="10,5"/>
+            <Button Name="OkButton"
+                    Content="OK"
+                    Click="OnOkClick"
+                    Padding="10,5"/>
+        </StackPanel>
+    </Grid>
+</Window>
+
