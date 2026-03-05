@@ -12,7 +12,7 @@ namespace KNCSDecomp
         public SettingsWindow()
         {
             InitializeComponent();
-            OutputDirectoryTextBox.Text = CSharpKOTOR.Formats.NCS.KNCSDecomp.Decompiler.settings.GetProperty("Output Directory");
+            OutputDirectoryTextBox.Text = BioWare.Resource.Formats.NCS.Decomp.Decompiler.settings.GetProperty("Output Directory");
         }
 
         private async void OnBrowseClick(object sender, RoutedEventArgs e)
@@ -23,7 +23,7 @@ namespace KNCSDecomp
             string initialDirectory = OutputDirectoryTextBox.Text;
             if (string.IsNullOrEmpty(initialDirectory))
             {
-                initialDirectory = CSharpKOTOR.Formats.NCS.KNCSDecomp.JavaSystem.GetProperty("user.dir");
+                initialDirectory = BioWare.Resource.Formats.NCS.Decomp.JavaSystem.GetProperty("user.dir");
             }
 
             System.Collections.Generic.IReadOnlyList<IStorageFolder> folder = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
@@ -42,8 +42,8 @@ namespace KNCSDecomp
 
         private void OnSaveClick(object sender, RoutedEventArgs e)
         {
-            CSharpKOTOR.Formats.NCS.KNCSDecomp.Decompiler.settings.SetProperty("Output Directory", OutputDirectoryTextBox.Text);
-            CSharpKOTOR.Formats.NCS.KNCSDecomp.Decompiler.settings.Save();
+            BioWare.Resource.Formats.NCS.Decomp.Decompiler.settings.SetProperty("Output Directory", OutputDirectoryTextBox.Text);
+            BioWare.Resource.Formats.NCS.Decomp.Decompiler.settings.Save();
             this.Close();
         }
 

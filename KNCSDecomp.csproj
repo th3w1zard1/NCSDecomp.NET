@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
@@ -27,7 +27,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CSharpKOTOR\CSharpKOTOR.csproj" />
+    <ProjectReference Include="vendor\BioWare.NET\BioWare.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="vendor\**" />
   </ItemGroup>
 
   <ItemGroup>

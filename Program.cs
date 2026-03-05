@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using Avalonia;
-using CSharpKOTOR.Formats.NCS.KNCSDecomp;
-using File = CSharpKOTOR.Formats.NCS.KNCSDecomp.File;
+using BioWare.Resource.Formats.NCS.Decomp;
+using File = BioWare.Resource.Formats.NCS.Decomp.NcsFile;
 
 namespace KNCSDecomp
 {
@@ -140,7 +140,7 @@ namespace KNCSDecomp
                     Console.WriteLine($"[Info] Decompiling: {filePath}");
 
                     int result = decompiler.Decompile(ncsFile);
-                    if (result == 0)
+                    if (result >= 1)
                     {
                         string generatedCode = decompiler.GetGeneratedCode(ncsFile);
                         if (generatedCode != null)
