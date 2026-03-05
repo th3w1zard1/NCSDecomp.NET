@@ -214,40 +214,33 @@ namespace BioWare.Utility.System
             }
 
             bool isDirectory = Directory.Exists(path);
-            string pathStr = path;
-
-            // Quote the path if it contains spaces
-            if (pathStr.Contains(" "))
-            {
-                pathStr = $"\"{pathStr}\"";
-            }
 
             bool allStepsSucceeded = true;
 
             // Step 1: Reset permissions and re-enable inheritance using icacls
             logAction($"Step 1: Resetting permissions and re-enabling inheritance for {path}...");
-            if (!RunIcaclsReset(pathStr, isDirectory, recurse, logAction))
+            if (!RunIcaclsReset(path, isDirectory, recurse, logAction))
             {
                 allStepsSucceeded = false;
             }
 
             // Step 2: Take ownership using takeown
             logAction($"Step 2: Attempting to take ownership of {path}...");
-            if (!RunTakeOwn(pathStr, isDirectory, recurse, logAction))
+            if (!RunTakeOwn(path, isDirectory, recurse, logAction))
             {
                 allStepsSucceeded = false;
             }
 
             // Step 3: Grant full access using icacls
             logAction($"Step 3: Attempting to set access rights of {path} using icacls...");
-            if (!RunIcaclsGrant(pathStr, isDirectory, recurse, logAction))
+            if (!RunIcaclsGrant(path, isDirectory, recurse, logAction))
             {
                 allStepsSucceeded = false;
             }
 
             // Step 4: Remove read-only/system/hidden attributes using attrib
             logAction($"Step 4: Removing system/hidden/read-only attributes from {path}...");
-            if (!RunAttribRemove(pathStr, isDirectory, recurse, logAction))
+            if (!RunAttribRemove(path, isDirectory, recurse, logAction))
             {
                 allStepsSucceeded = false;
             }
@@ -258,23 +251,23 @@ namespace BioWare.Utility.System
         /// <summary>
         /// Runs icacls /reset command to reset permissions and re-enable inheritance.
         /// </summary>
-        private static bool RunIcaclsReset(string pathStr, bool isDirectory, bool recurse, Action<string> logAction)
+        private static bool RunIcaclsReset(string path, bool isDirectory, bool recurse, Action<string> logAction)
         {
-            var args = new List<string> { pathStr, "/reset", "/Q" };
+            var args = new List<string> { path, "/reset", "/Q" };
             if (isDirectory && recurse)
             {
                 args.Add("/T");
             }
 
-            return RunProcess("icacls", string.Join(" ", args), 60, logAction);
+            return RunProcess("icacls", args, 60, logAction);
         }
 
         /// <summary>
         /// Runs takeown command to take ownership of the file or directory.
         /// </summary>
-        private static bool RunTakeOwn(string pathStr, bool isDirectory, bool recurse, Action<string> logAction)
+        private static bool RunTakeOwn(string path, bool isDirectory, bool recurse, Action<string> logAction)
         {
-            var args = new List<string> { "/F", pathStr, "/SKIPSL" };
+            var args = new List<string> { "/F", path, "/SKIPSL" };
             if (isDirectory)
             {
                 args.Add("/D");
@@ -285,26 +278,26 @@ namespace BioWare.Utility.System
                 }
             }
 
-            return RunProcess("takeown", string.Join(" ", args), 60, logAction);
+            return RunProcess("takeown", args, 60, logAction);
         }
 
         /// <summary>
         /// Runs icacls /grant command to grant full access to everyone.
         /// </summary>
-        private static bool RunIcaclsGrant(string pathStr, bool isDirectory, bool recurse, Action<string> logAction)
+        private static bool RunIcaclsGrant(string path, bool isDirectory, bool recurse, Action<string> logAction)
         {
             // *S-1-1-0 is the SID for "Everyone" group
             // (OI) = Object Inherit, (CI) = Container Inherit, F = Full Control
-            var args = new List<string> { pathStr, "/grant", "*S-1-1-0:(OI)(CI)F", "/C", "/L", "/Q" };
+            var args = new List<string> { path, "/grant", "*S-1-1-0:(OI)(CI)F", "/C", "/L", "/Q" };
             if (recurse)
             {
                 args.Add("/T");
             }
 
-            bool success = RunProcess("icacls", string.Join(" ", args), 60, logAction);
+            bool success = RunProcess("icacls", args, 60, logAction);
             if (success)
             {
-                logAction($"Permissions set successfully for {pathStr}");
+                logAction($"Permissions set successfully for {path}");
             }
             return success;
         }
@@ -312,10 +305,9 @@ namespace BioWare.Utility.System
         /// <summary>
         /// Runs attrib command to remove read-only, system, and hidden attributes.
         /// </summary>
-        private static bool RunAttribRemove(string pathStr, bool isDirectory, bool recurse, Action<string> logAction)
+        private static bool RunAttribRemove(string path, bool isDirectory, bool recurse, Action<string> logAction)
         {
             // Check attributes first to determine what needs to be removed
-            string unquotedPath = pathStr.Trim('"');
             bool isReadOnly = false;
             bool isHidden = false;
             bool isSystem = false;
@@ -324,7 +316,7 @@ namespace BioWare.Utility.System
             {
                 if (isDirectory)
                 {
-                    var dirInfo = new DirectoryInfo(unquotedPath);
+                    var dirInfo = new DirectoryInfo(path);
                     if (dirInfo.Exists)
                     {
                         isReadOnly = (dirInfo.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly;
@@ -334,7 +326,7 @@ namespace BioWare.Utility.System
                 }
                 else
                 {
-                    var fileInfo = new FileInfo(unquotedPath);
+                    var fileInfo = new FileInfo(path);
                     if (fileInfo.Exists)
                     {
                         isReadOnly = fileInfo.IsReadOnly;
@@ -345,7 +337,7 @@ namespace BioWare.Utility.System
             }
             catch (Exception ex)
             {
-                logAction($"Warning: Could not check attributes for {unquotedPath}: {ex.Message}");
+                logAction($"Warning: Could not check attributes for {path}: {ex.Message}");
             }
 
             var args = new List<string>();
@@ -368,18 +360,18 @@ namespace BioWare.Utility.System
                 }
             }
 
-            args.Add(pathStr);
+            args.Add(path);
 
-            bool success = RunProcess("attrib", string.Join(" ", args), 60, logAction);
+            bool success = RunProcess("attrib", args, 60, logAction);
             if (success)
             {
-                logAction($"Attributes removed successfully for {pathStr}");
+                logAction($"Attributes removed successfully for {path}");
             }
 
             // If the item was hidden, re-apply the hidden attribute after removing read-only
             if (isHidden && success)
             {
-                logAction($"Step 4.5: Re-applying the hidden attribute to {pathStr}...");
+                logAction($"Step 4.5: Re-applying the hidden attribute to {path}...");
                 var rehideArgs = new List<string> { "+H" };
                 if (isDirectory)
                 {
@@ -389,8 +381,8 @@ namespace BioWare.Utility.System
                         rehideArgs.Add("/S");
                     }
                 }
-                rehideArgs.Add(pathStr);
-                RunProcess("attrib", string.Join(" ", rehideArgs), 60, logAction);
+                rehideArgs.Add(path);
+                RunProcess("attrib", rehideArgs, 60, logAction);
             }
 
             return success;
@@ -398,21 +390,27 @@ namespace BioWare.Utility.System
 
         /// <summary>
         /// Runs a process with the given executable name and arguments.
+        /// Each element of <paramref name="argumentList"/> is passed as a separate atomic argument
+        /// via <see cref="ProcessStartInfo.ArgumentList"/>, preventing argument splitting on spaces
+        /// and argument injection through embedded quotes in path components.
         /// </summary>
-        private static bool RunProcess(string executable, string arguments, int timeoutSeconds, Action<string> logAction)
+        private static bool RunProcess(string executable, IEnumerable<string> argumentList, int timeoutSeconds, Action<string> logAction)
         {
             try
             {
                 var processStartInfo = new ProcessStartInfo
                 {
                     FileName = executable,
-                    Arguments = arguments,
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     CreateNoWindow = true,
                     WindowStyle = ProcessWindowStyle.Hidden
                 };
+                foreach (string arg in argumentList)
+                {
+                    processStartInfo.ArgumentList.Add(arg);
+                }
 
                 using (var process = Process.Start(processStartInfo))
                 {
