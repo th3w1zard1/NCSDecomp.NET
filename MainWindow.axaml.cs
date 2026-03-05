@@ -364,7 +364,7 @@ namespace KNCSDecomp
             }
         }
 
-        private async void OnDrop(object sender, DragEventArgs e)
+        private void OnDrop(object sender, DragEventArgs e)
         {
             try
             {
@@ -931,7 +931,9 @@ namespace KNCSDecomp
                 ShowMessageDialog("Error saving " + Path.GetFileName(canonicalPath) + "\nOutput directory does not exist; change in settings");
                 if (System.IO.File.Exists(canonicalPath))
                 {
-                    try { System.IO.File.Delete(canonicalPath); } catch { }
+                    try
+                    { System.IO.File.Delete(canonicalPath); }
+                    catch { }
                 }
             }
             catch (Exception ex)
@@ -939,7 +941,9 @@ namespace KNCSDecomp
                 ShowMessageDialog("Error saving " + Path.GetFileName(canonicalPath) + ": " + ex.Message);
                 if (System.IO.File.Exists(canonicalPath))
                 {
-                    try { System.IO.File.Delete(canonicalPath); } catch { }
+                    try
+                    { System.IO.File.Delete(canonicalPath); }
+                    catch { }
                 }
             }
             return null;
