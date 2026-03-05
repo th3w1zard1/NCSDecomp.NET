@@ -270,7 +270,9 @@ namespace BioWare.TSLPatcher
                     }
                     catch (Exception e)
                     {
+#if DEBUG
                         Console.WriteLine($"[DEBUG] Could not load base GFF {potentialBase.FullName}: {e.GetType().Name}: {e.Message}");
+#endif
                     }
                 }
             }
@@ -327,7 +329,9 @@ namespace BioWare.TSLPatcher
                         }
                         catch (Exception e)
                         {
+#if DEBUG
                             Console.WriteLine($"[DEBUG] Could not load base SSF '{potentialBase.FullName}': {e.GetType().Name}: {e.Message}");
+#endif
                         }
                     }
                 }
@@ -361,11 +365,15 @@ namespace BioWare.TSLPatcher
                             catch (KeyNotFoundException ex)
                             {
                                 // Token not yet resolved - this is expected during generation
+#if DEBUG
                                 Console.WriteLine($"[DEBUG] StrRef token not resolved during generation: {ex.Message}");
+#endif
                             }
                             catch (Exception ex)
                             {
+#if DEBUG
                                 Console.WriteLine($"[DEBUG] Failed to apply SSF modification: {ex.GetType().Name}: {ex.Message}");
+#endif
                             }
                         }
                     }
@@ -479,7 +487,9 @@ namespace BioWare.TSLPatcher
                                     // Write extracted resource using appropriate io function
                                     WriteResourceWithIo(resourceData, destFile.FullName, resExt);
                                     copiedFiles[filename] = destFile;
+#if DEBUG
                                     Console.WriteLine($"[DEBUG] Extracted resource from module: {filename} from {moduleName}");
+#endif
                                 }
                                 catch (Exception e)
                                 {
@@ -876,13 +886,17 @@ namespace BioWare.TSLPatcher
                         }
                         break;
                     default:
+#if DEBUG
                         Console.WriteLine($"[DEBUG] No setter for field type: {fieldType}");
+#endif
                         break;
                 }
             }
             catch (Exception e)
             {
+#if DEBUG
                 Console.WriteLine($"[DEBUG] Error setting field {label} with type {fieldType}: {e.Message}");
+#endif
             }
         }
 

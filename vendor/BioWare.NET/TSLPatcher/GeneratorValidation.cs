@@ -74,7 +74,9 @@ namespace BioWare.TSLPatcher
             }
             catch (Exception e)
             {
+#if DEBUG
                 Console.WriteLine($"[DEBUG] Installation check failed for '{path}': {e.GetType().Name}: {e.Message}");
+#endif
                 return false;
             }
         }
