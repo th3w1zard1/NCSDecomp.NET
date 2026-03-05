@@ -70,6 +70,13 @@ ScaffoldingReadMe.txt
 *~
 CodeCoverage/
 
+# User-specific runtime configuration files that may contain local filesystem paths
+# (e.g. KNCSDecomp.conf committed in the initial commit contained developer PII)
+KNCSDecomp.conf
+ncsdecomp.conf
+dencs.conf
+*.conf
+
 # MSBuild Binary and Structured Log
 *.binlog
 
