@@ -35,7 +35,7 @@ The decompiler needs `nwscript.nss` / `k1_nwscript.nss` at runtime for function 
 ### Gotchas
 
 - The CLI `--help` flag only works when at least one file path arg is also provided (otherwise the app enters GUI mode).
-- GUI mode requires X11/Wayland. In headless environments it exits gracefully.
+- GUI mode requires X11/Wayland. Cloud VMs have Xvfb running on `DISPLAY=:1` by default, so the GUI works out of the box.
 - The `vendor/BioWare.NET/` directory is excluded from the main project's `<Compile>` scope to avoid assembly info conflicts. The `<Compile Remove="vendor\**" />` in `KNCSDecomp.csproj` handles this.
 - `nwnnsscomp.exe` is optional; without it the decompiler skips bytecode round-trip verification but still produces decompiled NSS output.
 - CI builds with `-p:TreatWarningsAsErrors=true` but all 126 warnings come from the vendored `BioWare.NET` library, not the main project. A plain `dotnet build` succeeds and the main project compiles warning-free.
