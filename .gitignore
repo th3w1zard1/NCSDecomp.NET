@@ -89,3 +89,6 @@ nunit-*.xml
 
 .history/
 
+# Round-trip/manual test artifacts
+test-work/
+

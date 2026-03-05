@@ -148,6 +148,12 @@ namespace KNCSDecomp
                     return generic;
                 }
 
+                var toolsGeneric = new File(Path.Combine(cwd, "tools", "nwscript.nss"));
+                if (toolsGeneric.IsFile())
+                {
+                    return toolsGeneric;
+                }
+
                 Console.Error.WriteLine("Error: nwscript.nss not found in current directory: " + cwd);
                 Console.Error.WriteLine();
                 Console.Error.WriteLine("Please use one of the following:");
