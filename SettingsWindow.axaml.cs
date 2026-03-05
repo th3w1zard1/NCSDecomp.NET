@@ -18,12 +18,13 @@ namespace KNCSDecomp
         private async void OnBrowseClick(object sender, RoutedEventArgs e)
         {
             var topLevel = TopLevel.GetTopLevel(this);
-            if (topLevel is null) return;
+            if (topLevel is null)
+                return;
 
             string initialDirectory = OutputDirectoryTextBox.Text;
             if (string.IsNullOrEmpty(initialDirectory))
             {
-                initialDirectory = BioWare.Resource.Formats.NCS.Decomp.JavaSystem.GetProperty("user.dir");
+                initialDirectory = Environment.CurrentDirectory;
             }
 
             System.Collections.Generic.IReadOnlyList<IStorageFolder> folder = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
