@@ -14,16 +14,16 @@ using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
-using Decompiler = CSharpKOTOR.Formats.NCS.KNCSDecomp.Decompiler;
-using File = CSharpKOTOR.Formats.NCS.KNCSDecomp.File;
-using JavaSystem = CSharpKOTOR.Formats.NCS.KNCSDecomp.JavaSystem;
+using Decompiler = BioWare.Resource.Formats.NCS.Decomp.Decompiler;
+using File = BioWare.Resource.Formats.NCS.Decomp.NcsFile;
+using JavaSystem = BioWare.Resource.Formats.NCS.Decomp.JavaSystem;
 using MsgBoxIcon = MsBox.Avalonia.Enums.Icon;
 
 namespace KNCSDecomp
 {
     public partial class MainWindow : Window
     {
-        private readonly CSharpKOTOR.Formats.NCS.KNCSDecomp.FileDecompiler fileDecompiler;
+        private readonly BioWare.Resource.Formats.NCS.Decomp.FileDecompiler fileDecompiler;
         private readonly Dictionary<object, File> hash_TabComponent2File;
         private readonly Dictionary<object, Dictionary<object, object>> hash_TabComponent2Func2VarVec;
         private readonly Dictionary<object, object> hash_TabComponent2TreeModel;
@@ -34,7 +34,7 @@ namespace KNCSDecomp
         static MainWindow()
         {
             unsavedFiles = new List<File>();
-            Decompiler.settings = new CSharpKOTOR.Formats.NCS.KNCSDecomp.Settings();
+            Decompiler.settings = new BioWare.Resource.Formats.NCS.Decomp.Settings();
             Decompiler.settings.Load();
             // Output directory validation will be done when window is shown
         }
@@ -45,7 +45,7 @@ namespace KNCSDecomp
 
             // Initialize FileDecompiler - now lazy-loads nwscript.nss, so won't crash if file is missing
             // The default constructor uses Decompiler.settings automatically
-            fileDecompiler = new CSharpKOTOR.Formats.NCS.KNCSDecomp.FileDecompiler();
+            fileDecompiler = new BioWare.Resource.Formats.NCS.Decomp.FileDecompiler();
 
             hash_TabComponent2File = new Dictionary<object, File>();
             hash_TabComponent2Func2VarVec = new Dictionary<object, Dictionary<object, object>>();
@@ -506,7 +506,7 @@ namespace KNCSDecomp
             {
                 result = fileDecompiler.Decompile(file);
             }
-            catch (CSharpKOTOR.Formats.NCS.KNCSDecomp.DecompilerException ex)
+            catch (BioWare.Resource.Formats.NCS.Decomp.DecompilerException ex)
             {
                 string errorMsg = ex.Message;
                 // Check if it's a missing nwscript.nss error
@@ -533,11 +533,11 @@ namespace KNCSDecomp
                             SetTabContent(tabItem, decompiledCode, originalByteCode, newByteCode);
 
                             hash_Func2VarVec = fileDecompiler.GetVariableData(file);
-                            UpdateTreeView(CSharpKOTOR.Formats.NCS.KNCSDecomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec));
+                            UpdateTreeView(BioWare.Resource.Formats.NCS.Decomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec));
                             fileDecompiler.GetOriginalByteCode(file);
                             hash_TabComponent2File[tabItem] = file;
                             hash_TabComponent2Func2VarVec[tabItem] = hash_Func2VarVec;
-                            hash_TabComponent2TreeModel[tabItem] = CSharpKOTOR.Formats.NCS.KNCSDecomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec);
+                            hash_TabComponent2TreeModel[tabItem] = BioWare.Resource.Formats.NCS.Decomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec);
                         }
                         AppendStatus("success\n");
                         break;
@@ -558,11 +558,11 @@ namespace KNCSDecomp
                             SetTabContent(tabItem, decompiledCode, originalByteCode, null);
 
                             hash_Func2VarVec = fileDecompiler.GetVariableData(file);
-                            UpdateTreeView(CSharpKOTOR.Formats.NCS.KNCSDecomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec));
+                            UpdateTreeView(BioWare.Resource.Formats.NCS.Decomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec));
                             fileDecompiler.GetOriginalByteCode(file);
                             hash_TabComponent2File[tabItem] = file;
                             hash_TabComponent2Func2VarVec[tabItem] = hash_Func2VarVec;
-                            hash_TabComponent2TreeModel[tabItem] = CSharpKOTOR.Formats.NCS.KNCSDecomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec);
+                            hash_TabComponent2TreeModel[tabItem] = BioWare.Resource.Formats.NCS.Decomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec);
                             SetTabComponentPanel(tabItem, 1);
                         }
                         AppendStatus("partial-could not recompile\n");
@@ -580,11 +580,11 @@ namespace KNCSDecomp
                             SetTabContent(tabItem, decompiledCode, originalByteCode, newByteCode);
 
                             hash_Func2VarVec = fileDecompiler.GetVariableData(file);
-                            UpdateTreeView(CSharpKOTOR.Formats.NCS.KNCSDecomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec));
+                            UpdateTreeView(BioWare.Resource.Formats.NCS.Decomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec));
                             fileDecompiler.GetOriginalByteCode(file);
                             hash_TabComponent2File[tabItem] = file;
                             hash_TabComponent2Func2VarVec[tabItem] = hash_Func2VarVec;
-                            hash_TabComponent2TreeModel[tabItem] = CSharpKOTOR.Formats.NCS.KNCSDecomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec);
+                            hash_TabComponent2TreeModel[tabItem] = BioWare.Resource.Formats.NCS.Decomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec);
                             SetTabComponentPanel(tabItem, 1);
                         }
                         AppendStatus("partial-byte code does not match\n");
@@ -1048,7 +1048,7 @@ namespace KNCSDecomp
                 {
                     result = fileDecompiler.CompileAndCompare(file, newFile);
                 }
-                catch (CSharpKOTOR.Formats.NCS.KNCSDecomp.DecompilerException ex)
+                catch (BioWare.Resource.Formats.NCS.Decomp.DecompilerException ex)
                 {
                     ShowMessageDialog(ex.Message);
                     return;
@@ -1063,11 +1063,11 @@ namespace KNCSDecomp
                             SetTabContent(tabItem, decompiledCode, originalByteCode, newByteCode);
 
                             hash_Func2VarVec = fileDecompiler.GetVariableData(file);
-                            UpdateTreeView(CSharpKOTOR.Formats.NCS.KNCSDecomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec));
+                            UpdateTreeView(BioWare.Resource.Formats.NCS.Decomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec));
                             fileDecompiler.GetOriginalByteCode(file);
                             hash_TabComponent2File[tabItem] = file;
                             hash_TabComponent2Func2VarVec[tabItem] = hash_Func2VarVec;
-                            hash_TabComponent2TreeModel[tabItem] = CSharpKOTOR.Formats.NCS.KNCSDecomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec);
+                            hash_TabComponent2TreeModel[tabItem] = BioWare.Resource.Formats.NCS.Decomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec);
                             AppendStatus("success\n");
                             break;
                         }
@@ -1082,11 +1082,11 @@ namespace KNCSDecomp
                             SetTabContent(tabItem, decompiledCode, originalByteCode, null);
 
                             hash_Func2VarVec = fileDecompiler.GetVariableData(file);
-                            UpdateTreeView(CSharpKOTOR.Formats.NCS.KNCSDecomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec));
+                            UpdateTreeView(BioWare.Resource.Formats.NCS.Decomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec));
                             fileDecompiler.GetOriginalByteCode(file);
                             hash_TabComponent2File[tabItem] = file;
                             hash_TabComponent2Func2VarVec[tabItem] = hash_Func2VarVec;
-                            hash_TabComponent2TreeModel[tabItem] = CSharpKOTOR.Formats.NCS.KNCSDecomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec);
+                            hash_TabComponent2TreeModel[tabItem] = BioWare.Resource.Formats.NCS.Decomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec);
                             SetTabComponentPanel(tabItem, 1);
                             AppendStatus("partial-could not recompile\n");
                             break;
@@ -1098,11 +1098,11 @@ namespace KNCSDecomp
                             SetTabContent(tabItem, decompiledCode, originalByteCode, newByteCode);
 
                             hash_Func2VarVec = fileDecompiler.GetVariableData(file);
-                            UpdateTreeView(CSharpKOTOR.Formats.NCS.KNCSDecomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec));
+                            UpdateTreeView(BioWare.Resource.Formats.NCS.Decomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec));
                             fileDecompiler.GetOriginalByteCode(file);
                             hash_TabComponent2File[tabItem] = file;
                             hash_TabComponent2Func2VarVec[tabItem] = hash_Func2VarVec;
-                            hash_TabComponent2TreeModel[tabItem] = CSharpKOTOR.Formats.NCS.KNCSDecomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec);
+                            hash_TabComponent2TreeModel[tabItem] = BioWare.Resource.Formats.NCS.Decomp.TreeModelFactory.CreateTreeModel(hash_Func2VarVec);
                             SetTabComponentPanel(tabItem, 1);
                             AppendStatus("partial-byte code does not match\n");
                             break;

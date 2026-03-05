@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using Avalonia;
-using CSharpKOTOR.Formats.NCS.KNCSDecomp;
-using File = CSharpKOTOR.Formats.NCS.KNCSDecomp.File;
+using BioWare.Resource.Formats.NCS.Decomp;
+using File = BioWare.Resource.Formats.NCS.Decomp.NcsFile;
 
 namespace KNCSDecomp
 {

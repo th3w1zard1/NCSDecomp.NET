@@ -1,0 +1,11 @@
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+*.suo
+*.user
+.vs/
+.idea/
+.vscode/
+*.nupkg
+*.snupkg
