@@ -1,0 +1,41 @@
+version: 2
+
+updates:
+  # NuGet — main project
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '08:00'
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies
+    groups:
+      avalonia:
+        patterns:
+          - 'Avalonia*'
+
+  # NuGet — vendored BioWare.NET library
+  - package-ecosystem: nuget
+    directory: /vendor/BioWare.NET
+    schedule:
+      interval: weekly
+      day: monday
+      time: '08:00'
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - vendor
+
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '08:00'
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - github-actions
