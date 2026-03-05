@@ -127,16 +127,24 @@ namespace BioWare.Resource.Formats.NCS.Compiler
             bool isK2 = game == BioWareGame.TSL;
             NwnnsscompConfig config = new NwnnsscompConfig(compilerFile, sourceFile, outputFile, isK2);
 
+            // Use ArgumentList (not Arguments) so each path is passed atomically.
+            // Arguments joined as a flat string would split on spaces inside path components,
+            // and embedded quotes could inject additional arguments into nwnnsscomp.exe.
+            // GetCompileArgs() prepends the executable as [0]; skip it — FileName handles that.
             var startInfo = new ProcessStartInfo
             {
                 FileName = _nwnnsscompPath,
-                Arguments = string.Join(" ", config.GetCompileArgs(_nwnnsscompPath)),
                 WorkingDirectory = _tempScriptFolder,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
+            string[] compileArgs = config.GetCompileArgs(_nwnnsscompPath);
+            for (int i = 1; i < compileArgs.Length; i++)
+            {
+                startInfo.ArgumentList.Add(compileArgs[i]);
+            }
 
             using (var process = new Process { StartInfo = startInfo })
             {
