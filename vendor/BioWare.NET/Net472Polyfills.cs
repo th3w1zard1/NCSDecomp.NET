@@ -115,6 +115,12 @@ namespace System
         }
     }
 
+    // UNSAFE CODE JUSTIFICATION: The two methods below use pointer-based type-punning to
+    // reinterpret the bit pattern of an int as a float and vice versa. This is a standard
+    // .NET Framework 4.7.2 polyfill for BitConverter.Int32BitsToSingle / SingleToInt32Bits,
+    // which were added in .NET Core 2.0. The operations are safe because both types are
+    // exactly 4 bytes and the pointers never escape the method scope.
+    // AllowUnsafeBlocks in BioWare.csproj is required solely for this class.
     internal static class Net472BitConverterExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

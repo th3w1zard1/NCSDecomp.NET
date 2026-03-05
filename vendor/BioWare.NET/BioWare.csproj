@@ -7,6 +7,13 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
     <GenerateGlobalUsings>false</GenerateGlobalUsings>
+    <!--
+      AllowUnsafeBlocks is required for Net472Polyfills.cs, which uses pointer-based
+      type-punning (*(float*)&value) to implement BitConverter polyfills absent in
+      .NET Framework 4.7.2. This is the ONLY file in the project that uses unsafe code.
+      Before adding any new unsafe code, obtain explicit review approval and document
+      the rationale here.
+    -->
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>BioWare</AssemblyName>
     <RootNamespace>BioWare</RootNamespace>
