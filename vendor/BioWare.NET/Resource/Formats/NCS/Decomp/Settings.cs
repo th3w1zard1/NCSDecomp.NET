@@ -72,8 +72,40 @@ namespace BioWare.Resource.Formats.NCS.Decomp
             FileDecompiler.isK2Selected = gameVariant.Equals("k2") || gameVariant.Equals("tsl") || gameVariant.Equals("2");
             FileDecompiler.preferSwitches = bool.Parse(GetProperty("Prefer Switches", "false"));
             FileDecompiler.strictSignatures = bool.Parse(GetProperty("Strict Signatures", "false"));
-            string nwnnsscompPath = GetProperty("nwnnsscomp Path", "");
-            FileDecompiler.nwnnsscompPath = string.IsNullOrEmpty(nwnnsscompPath) ? null : nwnnsscompPath;
+
+            // Handle both old single-path and newer split compiler path properties.
+            string folderPath = GetProperty("nwnnsscomp Folder Path", "");
+            string filename = GetProperty("nwnnsscomp Filename", "");
+            string resolvedCompilerPath = null;
+            if (!string.IsNullOrEmpty(folderPath) && !string.IsNullOrEmpty(filename))
+            {
+                string resolvedFolder = folderPath;
+                if (!Path.IsPathRooted(resolvedFolder))
+                {
+                    NcsFile baseDir = CompilerUtil.GetNCSDecompDirectory();
+                    resolvedFolder = Path.Combine(baseDir.GetAbsolutePath(), folderPath);
+                }
+
+                resolvedCompilerPath = Path.Combine(resolvedFolder, filename);
+            }
+            else
+            {
+                string nwnnsscompPath = GetProperty("nwnnsscomp Path", "");
+                if (!string.IsNullOrEmpty(nwnnsscompPath))
+                {
+                    if (Path.IsPathRooted(nwnnsscompPath))
+                    {
+                        resolvedCompilerPath = nwnnsscompPath;
+                    }
+                    else
+                    {
+                        NcsFile baseDir = CompilerUtil.GetNCSDecompDirectory();
+                        resolvedCompilerPath = Path.Combine(baseDir.GetAbsolutePath(), nwnnsscompPath);
+                    }
+                }
+            }
+
+            FileDecompiler.nwnnsscompPath = string.IsNullOrEmpty(resolvedCompilerPath) ? null : resolvedCompilerPath;
         }
 
         // Matching NCSDecomp implementation at vendor/NCSDecomp/src/main/java/com/kotor/resource/formats/ncs/Settings.java:419-429
@@ -105,14 +137,33 @@ namespace BioWare.Resource.Formats.NCS.Decomp
         public new void Reset()
         {
             base.Reset();
-            // Default output directory: ./ncsdecomp_converted relative to current working directory
-            string defaultOutputDir = Path.Combine(JavaSystem.GetProperty("user.dir"), "ncsdecomp_converted");
+            NcsFile appDir = CompilerUtil.GetNCSDecompDirectory();
+            string appDirPath = appDir.GetAbsolutePath();
+            // Default output directory: ./ncsdecomp_converted relative to app directory
+            string defaultOutputDir = Path.Combine(appDirPath, "ncsdecomp_converted");
             SetProperty("Output Directory", defaultOutputDir);
-            SetProperty("Open Directory", JavaSystem.GetProperty("user.dir"));
-            string defaultNwnnsscompPath = Path.Combine(Path.Combine(JavaSystem.GetProperty("user.dir"), "tools"), "nwnnsscomp.exe");
+            SetProperty("Open Directory", appDirPath);
+
+            string toolsPath = Path.Combine(appDirPath, "tools");
+            string defaultNwnnsscompFilename = "nwnnsscomp.exe";
+            string[] compilerNames = CompilerUtil.GetCompilerNames();
+            foreach (string candidate in compilerNames)
+            {
+                string candidatePath = Path.Combine(toolsPath, candidate);
+                if (System.IO.File.Exists(candidatePath))
+                {
+                    defaultNwnnsscompFilename = candidate;
+                    break;
+                }
+            }
+
+            string defaultNwnnsscompPath = Path.Combine(toolsPath, defaultNwnnsscompFilename);
             SetProperty("nwnnsscomp Path", defaultNwnnsscompPath);
-            string defaultK1Path = Path.Combine(Path.Combine(JavaSystem.GetProperty("user.dir"), "tools"), "k1_nwscript.nss");
-            string defaultK2Path = Path.Combine(Path.Combine(JavaSystem.GetProperty("user.dir"), "tools"), "tsl_nwscript.nss");
+            SetProperty("nwnnsscomp Folder Path", toolsPath);
+            SetProperty("nwnnsscomp Filename", defaultNwnnsscompFilename);
+
+            string defaultK1Path = Path.Combine(toolsPath, "k1_nwscript.nss");
+            string defaultK2Path = Path.Combine(toolsPath, "tsl_nwscript.nss");
             SetProperty("K1 nwscript Path", defaultK1Path);
             SetProperty("K2 nwscript Path", defaultK2Path);
             SetProperty("Game Variant", "k1");

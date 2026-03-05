@@ -2,25 +2,50 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="KNCSDecomp.SettingsWindow"
         Title="Settings"
-        Width="400" Height="150"
+        Width="680" Height="520"
         WindowStartupLocation="CenterOwner">
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
+    <Grid Margin="10" RowDefinitions="*,Auto">
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Output Directory:" VerticalAlignment="Center" Margin="0,0,8,6"/>
+                <TextBox Grid.Row="0" Grid.Column="1" Name="OutputDirectoryTextBox" Margin="0,0,8,6"/>
+                <Button Grid.Row="0" Grid.Column="2" Name="BrowseOutputButton" Content="Browse" Click="OnBrowseOutputClick" Margin="0,0,0,6"/>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="Output Directory:" VerticalAlignment="Center" Margin="0,0,5,5"/>
-        <TextBox Grid.Row="0" Grid.Column="1" Name="OutputDirectoryTextBox" Margin="0,0,5,5"/>
-        <Button Grid.Row="0" Grid.Column="2" Name="BrowseButton" Content="Browse" Click="OnBrowseClick" Margin="0,0,0,5"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Game Variant:" VerticalAlignment="Center" Margin="0,0,8,6"/>
+                <ComboBox Grid.Row="1" Grid.Column="1" Name="GameVariantComboBox" Margin="0,0,8,6" SelectedIndex="0">
+                    <ComboBoxItem Content="k1"/>
+                    <ComboBoxItem Content="k2"/>
+                </ComboBox>
 
-        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="K1 nwscript Path:" VerticalAlignment="Center" Margin="0,0,8,6"/>
+                <TextBox Grid.Row="2" Grid.Column="1" Name="K1NWScriptTextBox" Margin="0,0,8,6"/>
+                <Button Grid.Row="2" Grid.Column="2" Name="BrowseK1Button" Content="Browse" Click="OnBrowseK1Click" Margin="0,0,0,6"/>
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="K2 nwscript Path:" VerticalAlignment="Center" Margin="0,0,8,6"/>
+                <TextBox Grid.Row="3" Grid.Column="1" Name="K2NWScriptTextBox" Margin="0,0,8,6"/>
+                <Button Grid.Row="3" Grid.Column="2" Name="BrowseK2Button" Content="Browse" Click="OnBrowseK2Click" Margin="0,0,0,6"/>
+
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Encoding:" VerticalAlignment="Center" Margin="0,0,8,6"/>
+                <TextBox Grid.Row="4" Grid.Column="1" Name="EncodingTextBox" Margin="0,0,8,6"/>
+
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="File Extension:" VerticalAlignment="Center" Margin="0,0,8,6"/>
+                <TextBox Grid.Row="5" Grid.Column="1" Name="FileExtensionTextBox" Margin="0,0,8,6"/>
+
+                <TextBlock Grid.Row="6" Grid.Column="0" Text="Filename Prefix:" VerticalAlignment="Center" Margin="0,0,8,6"/>
+                <TextBox Grid.Row="6" Grid.Column="1" Name="FilenamePrefixTextBox" Margin="0,0,8,6"/>
+
+                <TextBlock Grid.Row="7" Grid.Column="0" Text="Filename Suffix:" VerticalAlignment="Center" Margin="0,0,8,6"/>
+                <TextBox Grid.Row="7" Grid.Column="1" Name="FilenameSuffixTextBox" Margin="0,0,8,6"/>
+
+                <StackPanel Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,4,0,0">
+                    <CheckBox Name="OverwriteFilesCheckBox" Content="Overwrite existing files" Margin="0,0,0,4"/>
+                    <CheckBox Name="PreferSwitchesCheckBox" Content="Prefer switch statements" Margin="0,0,0,4"/>
+                    <CheckBox Name="StrictSignaturesCheckBox" Content="Strict signatures"/>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
             <Button Name="SaveButton" Content="Save" Click="OnSaveClick" Margin="0,0,5,0" MinWidth="75"/>
             <Button Name="CancelButton" Content="Cancel" Click="OnCancelClick" MinWidth="75"/>
         </StackPanel>

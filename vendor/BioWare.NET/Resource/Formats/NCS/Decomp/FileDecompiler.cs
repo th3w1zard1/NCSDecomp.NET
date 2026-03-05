@@ -1031,20 +1031,200 @@ namespace BioWare.Resource.Formats.NCS.Decomp
 
         private int CompileAndCompare(NcsFile file, NcsFile newfile, Utils.FileScriptData data)
         {
-            string code = this.ReadFile(newfile);
-            return this.CompileAndCompare(file, code, data);
+            if (data == null)
+            {
+                data = new Utils.FileScriptData();
+                if (!this.filedata.ContainsKey(file))
+                {
+                    this.filedata[file] = data;
+                }
+            }
+
+            if (!this.CheckCompilerExists())
+            {
+                Error("nwnnsscomp.exe not found - skipping bytecode validation. Decompiled source will still be shown.");
+                NcsFile compiler = this.GetCompilerFile();
+                if (compiler != null)
+                {
+                    Error("Looking for: " + compiler.GetAbsolutePath());
+                }
+                else
+                {
+                    Error("No compiler configured");
+                }
+                return PARTIAL_COMPILE;
+            }
+
+            NcsFile newcompiled = null;
+            NcsFile newdecompiled = null;
+            NcsFile olddecompiled = null;
+            try
+            {
+                Debug("[Decomp] Decompiling original NCS file to capture bytecode...");
+                olddecompiled = this.ExternalDecompile(file, isK2Selected, null);
+                if (olddecompiled == null || !olddecompiled.Exists())
+                {
+                    Error("[Decomp] nwnnsscomp decompile of original NCS file failed.");
+                    Error("[Decomp] Expected output file: " + (olddecompiled != null ? olddecompiled.GetAbsolutePath() : "null"));
+                    return PARTIAL_COMPILE;
+                }
+
+                data.SetOriginalByteCode(this.ReadFile(olddecompiled));
+
+                Debug("[Decomp] Compiling generated NSS file...");
+                NcsFile outputDir = newfile != null ? newfile.GetParentFile() : null;
+                newcompiled = this.ExternalCompile(newfile, isK2Selected, outputDir);
+                if (newcompiled == null || !newcompiled.Exists())
+                {
+                    Error("[Decomp] nwnnsscomp compilation of generated NSS file failed.");
+                    Error("[Decomp] Input file: " + (newfile != null ? newfile.GetAbsolutePath() : "null"));
+                    Error("[Decomp] Expected output: " + (newcompiled != null ? newcompiled.GetAbsolutePath() : "null"));
+                    return PARTIAL_COMPILE;
+                }
+
+                Debug("[Decomp] Decompiling newly compiled NCS file to capture bytecode...");
+                newdecompiled = this.ExternalDecompile(newcompiled, isK2Selected, null);
+                if (newdecompiled == null || !newdecompiled.Exists())
+                {
+                    Error("[Decomp] nwnnsscomp decompile of newly compiled file failed.");
+                    Error("[Decomp] Expected output file: " + (newdecompiled != null ? newdecompiled.GetAbsolutePath() : "null"));
+                    return PARTIAL_COMPILE;
+                }
+
+                data.SetNewByteCode(this.ReadFile(newdecompiled));
+                if (this.CompareBinaryFiles(file, newcompiled))
+                {
+                    return SUCCESS;
+                }
+
+                string diff = this.ComparePcodeFiles(olddecompiled, newdecompiled);
+                if (diff != null)
+                {
+                    Debug("P-code difference: " + diff);
+                }
+            }
+            catch (Exception e)
+            {
+                Error("[Decomp] EXCEPTION during bytecode validation:");
+                Error("[Decomp] Exception Type: " + e.GetType().Name);
+                Error("[Decomp] Exception Message: " + e.Message);
+                if (e.InnerException != null)
+                {
+                    Error("[Decomp] Caused by: " + e.InnerException.GetType().Name + " - " + e.InnerException.Message);
+                }
+                JavaExtensions.PrintStackTrace(e, JavaSystem.@err);
+                Error("[Decomp] Continuing with decompiled source (validation failed)");
+                return PARTIAL_COMPILE;
+            }
+            finally
+            {
+                try
+                {
+                    if (newcompiled != null)
+                    {
+                        newcompiled.Delete();
+                    }
+
+                    if (newdecompiled != null)
+                    {
+                        newdecompiled.Delete();
+                    }
+
+                    if (olddecompiled != null)
+                    {
+                        olddecompiled.Delete();
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
+
+            return PARTIAL_COMPARE;
         }
 
         private int CompileAndCompare(NcsFile file, string code, Utils.FileScriptData data)
         {
-            // TODO: Implement compilation and comparison logic
-            return SUCCESS;
+            this.EnsureActionsLoaded();
+            NcsFile generatedCode = null;
+            try
+            {
+                generatedCode = this.WriteCode(code);
+                return this.CompileAndCompare(file, generatedCode, data);
+            }
+            finally
+            {
+                try
+                {
+                    if (generatedCode != null)
+                    {
+                        generatedCode.Delete();
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
         }
 
         private int CompileNss(NcsFile nssFile, Utils.FileScriptData data)
         {
-            string code = this.ReadFile(nssFile);
-            return this.CompileAndCompare(nssFile, code, data);
+            if (!this.CheckCompilerExists())
+            {
+                Error("nwnnsscomp.exe not found - cannot compile NSS file.");
+                return FAILURE;
+            }
+
+            NcsFile newcompiled = null;
+            NcsFile newdecompiled = null;
+            try
+            {
+                NcsFile tempDir = new NcsFile(Path.Combine(JavaSystem.GetProperty("java.io.tmpdir"), "ncsdecomp_roundtrip"));
+                if (!tempDir.Exists())
+                {
+                    tempDir.Mkdirs();
+                }
+
+                newcompiled = this.ExternalCompile(nssFile, isK2Selected, tempDir);
+                if (newcompiled == null)
+                {
+                    return FAILURE;
+                }
+
+                newdecompiled = this.ExternalDecompile(newcompiled, isK2Selected, null);
+                if (newdecompiled != null)
+                {
+                    data.SetNewByteCode(this.ReadFile(newdecompiled));
+                    return SUCCESS;
+                }
+
+                Error("nwnnsscomp decompile of new compiled file failed. Check code.");
+            }
+            catch (Exception e)
+            {
+                Error("Error during compilation: " + e.Message);
+                return FAILURE;
+            }
+            finally
+            {
+                try
+                {
+                    if (newcompiled != null)
+                    {
+                        newcompiled.Delete();
+                    }
+
+                    if (newdecompiled != null)
+                    {
+                        newdecompiled.Delete();
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
+
+            return FAILURE;
         }
 
         private string ReadFile(NcsFile file)

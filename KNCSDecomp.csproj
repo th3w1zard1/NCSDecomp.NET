@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <Compile Remove="vendor\**" />
+    <Compile Remove="tests\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,5 +42,12 @@
     <Compile Update="**\*.axaml.cs">
       <DependentUpon>%(Filename)</DependentUpon>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="tools\*.nss">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 </Project>
