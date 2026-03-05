@@ -140,7 +140,7 @@ namespace KNCSDecomp
                     Console.WriteLine($"[Info] Decompiling: {filePath}");
 
                     int result = decompiler.Decompile(ncsFile);
-                    if (result == 0)
+                    if (result >= 1)
                     {
                         string generatedCode = decompiler.GetGeneratedCode(ncsFile);
                         if (generatedCode != null)

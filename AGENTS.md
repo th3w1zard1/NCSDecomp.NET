@@ -18,20 +18,22 @@ Requires .NET 8.0 SDK. In Cloud VMs it is installed at `$HOME/.dotnet` via the d
 
 - **Restore**: `dotnet restore`
 - **Build**: `dotnet build`
-- **Run CLI**: `dotnet run -- --help nonexistent.ncs` (needs a dummy file arg to enter CLI mode)
+- **Run CLI**: `dotnet run -- --help dummy.ncs` (needs a file arg to enter CLI mode)
 - **Run CLI decompile**: `dotnet run -- file.ncs --output-dir ./output`
-- **Run GUI**: `dotnet run` (requires display server / X11)
-- **Lint**: Build warnings serve as lint. No separate linter configured.
+- **Run GUI**: `dotnet run` (requires X11 display server)
+- **Lint**: Build warnings serve as lint; no separate linter configured.
 
 ### No automated tests
 
-This project has no test projects or test frameworks configured. Validation is done manually by decompiling `.ncs` files.
+No test projects or frameworks. Validation is manual via NCS file decompilation.
 
 ### Runtime data
 
-The decompiler requires `nwscript.nss` (KOTOR's standard script library) at runtime for full decompilation. Path is configurable in Settings. Without it, decompilation will fail with a `DecompilerException`.
+The decompiler needs `nwscript.nss` / `k1_nwscript.nss` at runtime for function signature resolution. These must be in the working directory or the build output directory. Copies from Andastra's `tools/` directory work. Without them, `DecompilerException` is thrown at decompile time.
 
 ### Gotchas
 
-- The CLI `--help` flag only triggers when at least one file path is also provided as an argument (otherwise the app defaults to GUI mode).
-- GUI mode requires X11/Wayland display. In headless environments it exits gracefully with a warning.
+- The CLI `--help` flag only works when at least one file path arg is also provided (otherwise the app enters GUI mode).
+- GUI mode requires X11/Wayland. In headless environments it exits gracefully.
+- The `vendor/BioWare.NET/` directory is excluded from the main project's `<Compile>` scope to avoid assembly info conflicts. The `<Compile Remove="vendor\**" />` in `KNCSDecomp.csproj` handles this.
+- `nwnnsscomp.exe` is optional; without it the decompiler skips bytecode round-trip verification but still produces decompiled NSS output.

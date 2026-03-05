@@ -63,4 +63,13 @@
   <ItemGroup>
     <Compile Remove="Net472Polyfills.cs" />
   </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resource\Formats\NCS\Decomp\lexer.dat">
+      <LogicalName>BioWare.Resource.Formats.NCS.Decomp.lexer.dat</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resource\Formats\NCS\Decomp\parser.dat">
+      <LogicalName>BioWare.Resource.Formats.NCS.Decomp.parser.dat</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
 </Project>
