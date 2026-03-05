@@ -23,9 +23,10 @@ Requires .NET 8.0 SDK. In Cloud VMs it is installed at `$HOME/.dotnet` via the d
 - **Run GUI**: `dotnet run` (requires X11 display server)
 - **Lint**: Build warnings serve as lint; no separate linter configured.
 
-### No automated tests
+### Tests & Format Check
 
-No test projects or frameworks. Validation is manual via NCS file decompilation.
+- **Tests**: `dotnet test tests/KNCSDecomp.RoundTripTests/KNCSDecomp.RoundTripTests.csproj` (xUnit round-trip: compile NSS → decompile NCS → recompile).
+- **Format check**: `dotnet format KNCSDecomp.csproj --verify-no-changes` (matches CI).
 
 ### Runtime data
 
@@ -37,3 +38,4 @@ The decompiler needs `nwscript.nss` / `k1_nwscript.nss` at runtime for function 
 - GUI mode requires X11/Wayland. In headless environments it exits gracefully.
 - The `vendor/BioWare.NET/` directory is excluded from the main project's `<Compile>` scope to avoid assembly info conflicts. The `<Compile Remove="vendor\**" />` in `KNCSDecomp.csproj` handles this.
 - `nwnnsscomp.exe` is optional; without it the decompiler skips bytecode round-trip verification but still produces decompiled NSS output.
+- CI builds with `-p:TreatWarningsAsErrors=true` but all 126 warnings come from the vendored `BioWare.NET` library, not the main project. A plain `dotnet build` succeeds and the main project compiles warning-free.
