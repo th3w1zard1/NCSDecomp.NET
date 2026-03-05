@@ -25,8 +25,31 @@ Requires .NET 8.0 SDK. In Cloud VMs it is installed at `$HOME/.dotnet` via the d
 
 ### Tests & Format Check
 
-- **Tests**: `dotnet test tests/KNCSDecomp.RoundTripTests/KNCSDecomp.RoundTripTests.csproj` (xUnit round-trip: compile NSS → decompile NCS → recompile).
-- **Format check**: `dotnet format KNCSDecomp.csproj --verify-no-changes` (matches CI).
+- **Tests**: `dotnet test tests/KNCSDecomp.RoundTripTests/KNCSDecomp.RoundTripTests.csproj`
+- **Format check**: `dotnet format KNCSDecomp.csproj --verify-no-changes` (matches CI)
+
+### Round-trip test flow
+
+The single xUnit test `RoundTrip_K1_SimpleScript_DecompilesAndRecompiles` proves the decompiler produces recompilable output:
+
+```
+NSS source string
+  → NCSAuto.CompileNss(source, K1)        // NssLexer → NssParser → NCS object
+  → NCSAuto.BytesNcs(ncs)                 // NCSBinaryWriter → byte[]
+  → write to temp .ncs file
+  → FileDecompiler.DecompileToString(file) // NCSBinaryReader → AST → GenerateCode → NSS string
+  → NCSAuto.CompileNss(decompiled, K1)    // recompile decompiled output
+  → NCSAuto.BytesNcs(recompiled)          // serialize again
+  → assert recompiled bytes are non-empty (default)
+     or assert byte-for-byte parity        (KNCSDECOMP_STRICT_ROUNDTRIP=1)
+```
+
+Key classes (all in `vendor/BioWare.NET/`):
+- `NCSAuto` (`Resource/Formats/NCS/NCSAuto.cs`) — compile/decompile/serialize entry points
+- `FileDecompiler` (`Resource/Formats/NCS/Decomp/FileDecompiler.cs`) — NCS→NSS decompilation engine
+- `NcsFile` (`Resource/Formats/NCS/Decomp/JavaStubs.cs`) — Java `File` shim wrapping `FileInfo`
+- `BioWareGame` (`Common/BiowareGame.cs`) — enum selecting K1/TSL game variant
+- `NCSBinaryReader/Writer` (`Resource/Formats/NCS/`) — NCS bytecode serialization
 
 ### Runtime data
 
