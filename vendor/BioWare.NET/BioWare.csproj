@@ -48,7 +48,7 @@
   <ItemGroup>
     <PackageReference Include="SharpCompress" Version="0.44.5" />
     <PackageReference Include="ini-parser-netstandard" Version="2.5.3" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
     <PackageReference Include="System.CommandLine" Version="2.0.2" />
